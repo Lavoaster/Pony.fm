@@ -21,7 +21,7 @@
 namespace Poniverse\Ponyfm\Http\Controllers\Api\Web;
 
 use App;
-use Poniverse\Ponyfm\Commands\CreateCommentCommand;
+use Poniverse\Ponyfm\Commands\Old\CreateCommentCommand;
 use Poniverse\Ponyfm\Models\Comment;
 use Poniverse\Ponyfm\Http\Controllers\ApiControllerBase;
 use Illuminate\Support\Facades\Request;

@@ -22,9 +22,9 @@ namespace Poniverse\Ponyfm\Http\Controllers\Api\Web;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Poniverse\Ponyfm\Models\Album;
-use Poniverse\Ponyfm\Commands\CreateAlbumCommand;
-use Poniverse\Ponyfm\Commands\DeleteAlbumCommand;
-use Poniverse\Ponyfm\Commands\EditAlbumCommand;
+use Poniverse\Ponyfm\Commands\Old\CreateAlbumCommand;
+use Poniverse\Ponyfm\Commands\Old\DeleteAlbumCommand;
+use Poniverse\Ponyfm\Commands\Old\EditAlbumCommand;
 use Poniverse\Ponyfm\Http\Controllers\ApiControllerBase;
 use Poniverse\Ponyfm\Models\Image;
 use Poniverse\Ponyfm\Models\ResourceLogItem;

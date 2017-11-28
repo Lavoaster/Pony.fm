@@ -2,7 +2,7 @@
 
 /**
  * Pony.fm - A community for pony fan music.
- * Copyright (C) 2016 Josef Citrine
+ * Copyright (C) 2015 Peter Deltchev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,27 +18,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Poniverse\Ponyfm\Commands;
+namespace Poniverse\Ponyfm\Commands\Old;
 
 use Gate;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Support\Str;
-use Poniverse\Ponyfm\Jobs\UpdateTagsForRenamedShowSong;
-use Poniverse\Ponyfm\Models\ShowSong;
+use Poniverse\Ponyfm\Models\Genre;
+use Poniverse\Ponyfm\Jobs\DeleteGenre;
 use Validator;
 
-class RenameShowSongCommand extends CommandBase
+class DeleteGenreCommand extends CommandBase
 {
     use DispatchesJobs;
 
-    /** @var Song */
-    private $_song;
-    private $_newName;
 
-    public function __construct($genreId, $newName)
+    /** @var Genre */
+    private $_genreToDelete;
+    private $_destinationGenre;
+
+    public function __construct($genreId, $destinationGenreId)
     {
-        $this->_song = ShowSong::find($genreId);
-        $this->_newName = $newName;
+        $this->_genreToDelete = Genre::find($genreId);
+        $this->_destinationGenre = Genre::find($destinationGenreId);
     }
 
     /**
@@ -46,7 +46,7 @@ class RenameShowSongCommand extends CommandBase
      */
     public function authorize()
     {
-        return Gate::allows('rename', $this->_song);
+        return Gate::allows('delete', $this->_genreToDelete);
     }
 
     /**
@@ -55,16 +55,16 @@ class RenameShowSongCommand extends CommandBase
      */
     public function execute()
     {
-        $slug = Str::slug($this->_newName);
-
         $rules = [
-            'title'      => 'required|unique:show_songs,title,'.$this->_song->id.',id|max:250',
-            'slug'      => 'required|unique:show_songs,slug,'.$this->_song->id.',id'
+            'genre_to_delete'    => 'required',
+            'destination_genre'  => 'required',
         ];
 
+        // The validation will fail if the genres don't exist
+        // because they'll be null.
         $validator = Validator::make([
-            'title' => $this->_newName,
-            'slug' => $slug
+            'genre_to_delete' => $this->_genreToDelete,
+            'destination_genre' => $this->_destinationGenre,
         ], $rules);
 
 
@@ -72,12 +72,8 @@ class RenameShowSongCommand extends CommandBase
             return CommandResponse::fail($validator);
         }
 
-        $this->_song->title = $this->_newName;
-        $this->_song->slug = $slug;
-        $this->_song->save();
+        $this->dispatch(new DeleteGenre($this->_genreToDelete, $this->_destinationGenre));
 
-        $this->dispatch(new UpdateTagsForRenamedShowSong($this->_song));
-
-        return CommandResponse::succeed(['message' => 'Show song renamed!']);
+        return CommandResponse::succeed(['message' => 'Genre deleted!']);
     }
 }

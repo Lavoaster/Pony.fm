@@ -2,7 +2,7 @@
 
 /**
  * Pony.fm - A community for pony fan music.
- * Copyright (C) 2016 Peter Deltchev
+ * Copyright (C) 2016 Josef Citrine
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,21 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Poniverse\Ponyfm\Commands;
+namespace Poniverse\Ponyfm\Commands\Old;
 
 use Gate;
-use Illuminate\Support\Str;
-use Poniverse\Ponyfm\Models\Genre;
+use Poniverse\Ponyfm\Models\Announcement;
 use Validator;
 
-class CreateGenreCommand extends CommandBase
+class CreateAnnouncementCommand extends CommandBase
 {
-    /** @var Genre */
-    private $_genreName;
+    /** @var Announcement */
+    private $_announcementName;
 
-    public function __construct($genreName)
+    public function __construct($announcementName)
     {
-        $this->_genreName = $genreName;
+        $this->_announcementName = $announcementName;
     }
 
     /**
@@ -40,7 +39,7 @@ class CreateGenreCommand extends CommandBase
      */
     public function authorize()
     {
-        return Gate::allows('create-genre');
+        return Gate::allows('create-announcement');
     }
 
     /**
@@ -49,27 +48,23 @@ class CreateGenreCommand extends CommandBase
      */
     public function execute()
     {
-        $slug = Str::slug($this->_genreName);
 
         $rules = [
-            'name'      => 'required|unique:genres,name,NULL,id,deleted_at,NULL|max:50',
-            'slug'      => 'required|unique:genres,slug,NULL,id,deleted_at,NULL'
+            'name' => 'required|max:50',
         ];
 
         $validator = Validator::make([
-            'name' => $this->_genreName,
-            'slug' => $slug
+            'name' => $this->_announcementName,
         ], $rules);
 
         if ($validator->fails()) {
             return CommandResponse::fail($validator);
         }
 
-        Genre::create([
-            'name' => $this->_genreName,
-            'slug' => $slug
+        Announcement::create([
+            'title' => $this->_announcementName,
         ]);
 
-        return CommandResponse::succeed(['message' => 'Genre created!']);
+        return CommandResponse::succeed(['message' => 'Announcement created!']);
     }
 }

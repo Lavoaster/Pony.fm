@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Poniverse\Ponyfm\Commands;
+namespace Poniverse\Ponyfm\Commands\Old;
 
 use Poniverse\Ponyfm\Models\Album;
 use Poniverse\Ponyfm\Models\Image;

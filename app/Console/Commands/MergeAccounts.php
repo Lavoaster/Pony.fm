@@ -24,7 +24,7 @@ use Carbon\Carbon;
 use DB;
 use Illuminate\Console\Command;
 use Illuminate\Support\Collection;
-use Poniverse\Ponyfm\Commands\MergeAccountsCommand;
+use Poniverse\Ponyfm\Commands\Old\MergeAccountsCommand;
 use Poniverse\Ponyfm\Models\Album;
 use Poniverse\Ponyfm\Models\Comment;
 use Poniverse\Ponyfm\Models\Favourite;

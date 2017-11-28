@@ -18,23 +18,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Poniverse\Ponyfm\Commands;
+namespace Poniverse\Ponyfm\Commands\Old;
 
-use Gate;
-use Poniverse\Ponyfm\Models\Track;
-
-class DeleteTrackCommand extends CommandBase
+abstract class CommandBase
 {
-    /** @var int  */
-    private $_trackId;
+    private $_listeners = [];
 
-    /** @var Track */
-    private $_track;
-
-    public function __construct($trackId)
+    public function listen($listener)
     {
-        $this->_trackId = $trackId;
-        $this->_track = Track::find($trackId);
+        $this->_listeners[] = $listener;
+    }
+
+    protected function notify($message, $progress)
+    {
+        foreach ($this->_listeners as $listener) {
+            $listener($message, $progress);
+        }
     }
 
     /**
@@ -42,25 +41,11 @@ class DeleteTrackCommand extends CommandBase
      */
     public function authorize()
     {
-        return Gate::allows('delete', $this->_track);
+        return true;
     }
 
     /**
-     * @throws \Exception
      * @return CommandResponse
      */
-    public function execute()
-    {
-        if ($this->_track->album_id != null) {
-            $album = $this->_track->album;
-            $this->_track->album_id = null;
-            $this->_track->track_number = null;
-            $this->_track->delete();
-            $album->updateTrackNumbers();
-        } else {
-            $this->_track->delete();
-        }
-
-        return CommandResponse::succeed();
-    }
+    abstract public function execute();
 }

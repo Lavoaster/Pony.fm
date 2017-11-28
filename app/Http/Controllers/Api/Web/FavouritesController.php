@@ -21,7 +21,7 @@
 namespace Poniverse\Ponyfm\Http\Controllers\Api\Web;
 
 use Poniverse\Ponyfm\Models\Album;
-use Poniverse\Ponyfm\Commands\ToggleFavouriteCommand;
+use Poniverse\Ponyfm\Commands\Old\ToggleFavouriteCommand;
 use Poniverse\Ponyfm\Models\Favourite;
 use Poniverse\Ponyfm\Http\Controllers\ApiControllerBase;
 use Poniverse\Ponyfm\Models\Playlist;

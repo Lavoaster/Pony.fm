@@ -21,7 +21,7 @@
 namespace Poniverse\Ponyfm\Http\Controllers\Api\Web;
 
 use Poniverse\Ponyfm\Http\Controllers\ApiControllerBase;
-use Poniverse\Ponyfm\Commands\SaveAccountSettingsCommand;
+use Poniverse\Ponyfm\Commands\Old\SaveAccountSettingsCommand;
 use Poniverse\Ponyfm\Models\User;
 use Poniverse\Ponyfm\Models\Image;
 use Gate;

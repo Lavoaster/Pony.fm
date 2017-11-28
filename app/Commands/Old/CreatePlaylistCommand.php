@@ -18,24 +18,20 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Poniverse\Ponyfm\Commands;
+namespace Poniverse\Ponyfm\Commands\Old;
 
-use Poniverse\Ponyfm\Models\PinnedPlaylist;
+use Notification;
 use Poniverse\Ponyfm\Models\Playlist;
 use Auth;
 use Validator;
 
-class EditPlaylistCommand extends CommandBase
+class CreatePlaylistCommand extends CommandBase
 {
     private $_input;
-    private $_playlistId;
-    private $_playlist;
 
-    public function __construct($playlistId, $input)
+    public function __construct($input)
     {
         $this->_input = $input;
-        $this->_playlistId = $playlistId;
-        $this->_playlist = Playlist::find($playlistId);
     }
 
     /**
@@ -43,9 +39,9 @@ class EditPlaylistCommand extends CommandBase
      */
     public function authorize()
     {
-        $user = Auth::user();
+        $user = \Auth::user();
 
-        return $this->_playlist && $user != null && ($this->_playlist->user_id == $user->id || $user->hasRole('admin'));
+        return $user != null;
     }
 
     /**
@@ -66,28 +62,27 @@ class EditPlaylistCommand extends CommandBase
             return CommandResponse::fail($validator);
         }
 
-        $this->_playlist->title = $this->_input['title'];
-        $this->_playlist->description = $this->_input['description'];
-        $this->_playlist->is_public = $this->_input['is_public'] == 'true';
+        $playlist = new Playlist();
+        $playlist->user_id = Auth::user()->id;
+        $playlist->title = $this->_input['title'];
+        $playlist->description = $this->_input['description'];
+        $playlist->is_public = $this->_input['is_public'] == 'true';
 
-        $this->_playlist->save();
+        $playlist->save();
+        
+        Notification::publishedNewPlaylist($playlist);
 
-        $pin = PinnedPlaylist::whereUserId(Auth::user()->id)->wherePlaylistId($this->_playlistId)->first();
-        if ($pin && $this->_input['is_pinned'] != 'true') {
-            $pin->delete();
-        } else {
-            if (!$pin && $this->_input['is_pinned'] == 'true') {
-                $this->_playlist->pin(Auth::user()->id);
-            }
+        if ($this->_input['is_pinned'] == 'true') {
+            $playlist->pin(Auth::user()->id);
         }
 
         return CommandResponse::succeed([
-            'id' => $this->_playlist->id,
-            'title' => $this->_playlist->title,
-            'slug' => $this->_playlist->slug,
-            'created_at' => $this->_playlist->created_at,
-            'description' => $this->_playlist->description,
-            'url' => $this->_playlist->url,
+            'id' => $playlist->id,
+            'title' => $playlist->title,
+            'slug' => $playlist->slug,
+            'created_at' => $playlist->created_at,
+            'description' => $playlist->description,
+            'url' => $playlist->url,
             'is_pinned' => $this->_input['is_pinned'] == 'true',
             'is_public' => $this->_input['is_public'] == 'true'
         ]);

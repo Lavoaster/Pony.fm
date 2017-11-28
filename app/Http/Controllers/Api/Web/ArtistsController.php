@@ -21,7 +21,7 @@
 namespace Poniverse\Ponyfm\Http\Controllers\Api\Web;
 
 use Gate;
-use Poniverse\Ponyfm\Commands\CreateUserCommand;
+use Poniverse\Ponyfm\Commands\Old\CreateUserCommand;
 use Poniverse\Ponyfm\Models\Album;
 use Poniverse\Ponyfm\Models\Comment;
 use Poniverse\Ponyfm\Models\Favourite;

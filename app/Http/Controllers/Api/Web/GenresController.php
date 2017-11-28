@@ -21,9 +21,9 @@
 namespace Poniverse\Ponyfm\Http\Controllers\Api\Web;
 
 use Illuminate\Support\Facades\Request;
-use Poniverse\Ponyfm\Commands\CreateGenreCommand;
-use Poniverse\Ponyfm\Commands\DeleteGenreCommand;
-use Poniverse\Ponyfm\Commands\RenameGenreCommand;
+use Poniverse\Ponyfm\Commands\Old\CreateGenreCommand;
+use Poniverse\Ponyfm\Commands\Old\DeleteGenreCommand;
+use Poniverse\Ponyfm\Commands\Old\RenameGenreCommand;
 use Poniverse\Ponyfm\Models\Genre;
 use Poniverse\Ponyfm\Http\Controllers\ApiControllerBase;
 use Response;

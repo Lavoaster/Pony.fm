@@ -20,7 +20,7 @@
 
 namespace Poniverse\Ponyfm\Http\Controllers\Api\Web;
 
-use Poniverse\Ponyfm\Commands\ToggleFollowingCommand;
+use Poniverse\Ponyfm\Commands\Old\ToggleFollowingCommand;
 use Poniverse\Ponyfm\Http\Controllers\ApiControllerBase;
 use Illuminate\Support\Facades\Request;
 

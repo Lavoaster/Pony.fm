@@ -20,7 +20,7 @@
 
 namespace Poniverse\Ponyfm\Http\Controllers;
 
-use Poniverse\Ponyfm\Commands\CommandBase;
+use Poniverse\Ponyfm\Commands\Old\CommandBase;
 use Response;
 
 abstract class ApiControllerBase extends Controller

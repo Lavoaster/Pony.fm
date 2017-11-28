@@ -21,7 +21,7 @@
 namespace Poniverse\Ponyfm\Http\Controllers\Api\Web;
 
 use Carbon\Carbon;
-use Poniverse\Ponyfm\Commands\CreateAnnouncementCommand;
+use Poniverse\Ponyfm\Commands\Old\CreateAnnouncementCommand;
 use Poniverse\Ponyfm\Http\Controllers\Controller;
 use Poniverse\Ponyfm\Models\Announcement;
 use Request;

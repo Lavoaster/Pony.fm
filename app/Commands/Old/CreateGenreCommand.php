@@ -2,7 +2,7 @@
 
 /**
  * Pony.fm - A community for pony fan music.
- * Copyright (C) 2016 Josef Citrine
+ * Copyright (C) 2016 Peter Deltchev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,27 +18,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Poniverse\Ponyfm\Commands;
+namespace Poniverse\Ponyfm\Commands\Old;
 
 use Gate;
-use Illuminate\Foundation\Bus\DispatchesJobs;
-use Poniverse\Ponyfm\Models\ShowSong;
-use Poniverse\Ponyfm\Jobs\DeleteShowSong;
+use Illuminate\Support\Str;
+use Poniverse\Ponyfm\Models\Genre;
 use Validator;
 
-class DeleteShowSongCommand extends CommandBase
+class CreateGenreCommand extends CommandBase
 {
-    use DispatchesJobs;
+    /** @var Genre */
+    private $_genreName;
 
-
-    /** @var ShowSong */
-    private $_songToDelete;
-    private $_destinationSong;
-
-    public function __construct($songId, $destinationSongId)
+    public function __construct($genreName)
     {
-        $this->_songToDelete = ShowSong::find($songId);
-        $this->_destinationSong = ShowSong::find($destinationSongId);
+        $this->_genreName = $genreName;
     }
 
     /**
@@ -46,7 +40,7 @@ class DeleteShowSongCommand extends CommandBase
      */
     public function authorize()
     {
-        return Gate::allows('delete', $this->_destinationSong);
+        return Gate::allows('create-genre');
     }
 
     /**
@@ -55,25 +49,27 @@ class DeleteShowSongCommand extends CommandBase
      */
     public function execute()
     {
+        $slug = Str::slug($this->_genreName);
+
         $rules = [
-            'song_to_delete'    => 'required',
-            'destination_song'  => 'required',
+            'name'      => 'required|unique:genres,name,NULL,id,deleted_at,NULL|max:50',
+            'slug'      => 'required|unique:genres,slug,NULL,id,deleted_at,NULL'
         ];
 
-        // The validation will fail if the genres don't exist
-        // because they'll be null.
         $validator = Validator::make([
-            'song_to_delete' => $this->_songToDelete,
-            'destination_song' => $this->_destinationSong,
+            'name' => $this->_genreName,
+            'slug' => $slug
         ], $rules);
-
 
         if ($validator->fails()) {
             return CommandResponse::fail($validator);
         }
 
-        $this->dispatch(new DeleteShowSong($this->_songToDelete, $this->_destinationSong));
+        Genre::create([
+            'name' => $this->_genreName,
+            'slug' => $slug
+        ]);
 
-        return CommandResponse::succeed(['message' => 'Song deleted!']);
+        return CommandResponse::succeed(['message' => 'Genre created!']);
     }
 }

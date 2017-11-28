@@ -2,7 +2,7 @@
 
 /**
  * Pony.fm - A community for pony fan music.
- * Copyright (C) 2015 Peter Deltchev
+ * Copyright (C) 2016 Josef Citrine
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,27 +18,27 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Poniverse\Ponyfm\Commands;
+namespace Poniverse\Ponyfm\Commands\Old;
 
 use Gate;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Poniverse\Ponyfm\Models\Genre;
-use Poniverse\Ponyfm\Jobs\DeleteGenre;
+use Poniverse\Ponyfm\Models\ShowSong;
+use Poniverse\Ponyfm\Jobs\DeleteShowSong;
 use Validator;
 
-class DeleteGenreCommand extends CommandBase
+class DeleteShowSongCommand extends CommandBase
 {
     use DispatchesJobs;
 
 
-    /** @var Genre */
-    private $_genreToDelete;
-    private $_destinationGenre;
+    /** @var ShowSong */
+    private $_songToDelete;
+    private $_destinationSong;
 
-    public function __construct($genreId, $destinationGenreId)
+    public function __construct($songId, $destinationSongId)
     {
-        $this->_genreToDelete = Genre::find($genreId);
-        $this->_destinationGenre = Genre::find($destinationGenreId);
+        $this->_songToDelete = ShowSong::find($songId);
+        $this->_destinationSong = ShowSong::find($destinationSongId);
     }
 
     /**
@@ -46,7 +46,7 @@ class DeleteGenreCommand extends CommandBase
      */
     public function authorize()
     {
-        return Gate::allows('delete', $this->_genreToDelete);
+        return Gate::allows('delete', $this->_destinationSong);
     }
 
     /**
@@ -56,15 +56,15 @@ class DeleteGenreCommand extends CommandBase
     public function execute()
     {
         $rules = [
-            'genre_to_delete'    => 'required',
-            'destination_genre'  => 'required',
+            'song_to_delete'    => 'required',
+            'destination_song'  => 'required',
         ];
 
         // The validation will fail if the genres don't exist
         // because they'll be null.
         $validator = Validator::make([
-            'genre_to_delete' => $this->_genreToDelete,
-            'destination_genre' => $this->_destinationGenre,
+            'song_to_delete' => $this->_songToDelete,
+            'destination_song' => $this->_destinationSong,
         ], $rules);
 
 
@@ -72,8 +72,8 @@ class DeleteGenreCommand extends CommandBase
             return CommandResponse::fail($validator);
         }
 
-        $this->dispatch(new DeleteGenre($this->_genreToDelete, $this->_destinationGenre));
+        $this->dispatch(new DeleteShowSong($this->_songToDelete, $this->_destinationSong));
 
-        return CommandResponse::succeed(['message' => 'Genre deleted!']);
+        return CommandResponse::succeed(['message' => 'Song deleted!']);
     }
 }

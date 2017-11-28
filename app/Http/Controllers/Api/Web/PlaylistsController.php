@@ -21,11 +21,11 @@
 namespace Poniverse\Ponyfm\Http\Controllers\Api\Web;
 
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Poniverse\Ponyfm\Commands\AddTrackToPlaylistCommand;
-use Poniverse\Ponyfm\Commands\CreatePlaylistCommand;
-use Poniverse\Ponyfm\Commands\DeletePlaylistCommand;
-use Poniverse\Ponyfm\Commands\EditPlaylistCommand;
-use Poniverse\Ponyfm\Commands\RemoveTrackFromPlaylistCommand;
+use Poniverse\Ponyfm\Commands\Old\AddTrackToPlaylistCommand;
+use Poniverse\Ponyfm\Commands\Old\CreatePlaylistCommand;
+use Poniverse\Ponyfm\Commands\Old\DeletePlaylistCommand;
+use Poniverse\Ponyfm\Commands\Old\EditPlaylistCommand;
+use Poniverse\Ponyfm\Commands\Old\RemoveTrackFromPlaylistCommand;
 use Poniverse\Ponyfm\Http\Controllers\ApiControllerBase;
 use Poniverse\Ponyfm\Models\Image;
 use Poniverse\Ponyfm\Models\Playlist;

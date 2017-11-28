@@ -18,23 +18,24 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Poniverse\Ponyfm\Commands;
+namespace Poniverse\Ponyfm\Commands\Old;
 
-use Poniverse\Ponyfm\Models\Playlist;
+use Gate;
+use Poniverse\Ponyfm\Models\Album;
 use Auth;
 
-class DeletePlaylistCommand extends CommandBase
+class DeleteAlbumCommand extends CommandBase
 {
     /** @var int */
-    private $_playlistId;
+    private $_albumId;
 
-    /** @var Playlist */
-    private $_playlist;
+    /** @var Album */
+    private $_album;
 
-    public function __construct($playlistId)
+    public function __construct($albumId)
     {
-        $this->_playlistId = $playlistId;
-        $this->_playlist = Playlist::find($playlistId);
+        $this->_albumId = $albumId;
+        $this->_album = Album::find($albumId);
     }
 
     /**
@@ -42,9 +43,7 @@ class DeletePlaylistCommand extends CommandBase
      */
     public function authorize()
     {
-        $user = Auth::user();
-
-        return $this->_playlist && $user != null && $this->_playlist->user_id == $user->id;
+        return Gate::allows('delete', $this->_album);
     }
 
     /**
@@ -53,11 +52,14 @@ class DeletePlaylistCommand extends CommandBase
      */
     public function execute()
     {
-        foreach ($this->_playlist->pins as $pin) {
-            $pin->delete();
+        foreach ($this->_album->tracks as $track) {
+            $track->album_id = null;
+            $track->track_number = null;
+            $track->updateTags();
+            $track->save();
         }
 
-        $this->_playlist->delete();
+        $this->_album->delete();
 
         return CommandResponse::succeed();
     }

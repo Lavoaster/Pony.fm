@@ -18,24 +18,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Poniverse\Ponyfm\Commands;
+namespace Poniverse\Ponyfm\Commands\Old;
 
 use Gate;
-use Poniverse\Ponyfm\Models\Album;
-use Auth;
+use Poniverse\Ponyfm\Models\Track;
 
-class DeleteAlbumCommand extends CommandBase
+class DeleteTrackCommand extends CommandBase
 {
-    /** @var int */
-    private $_albumId;
+    /** @var int  */
+    private $_trackId;
 
-    /** @var Album */
-    private $_album;
+    /** @var Track */
+    private $_track;
 
-    public function __construct($albumId)
+    public function __construct($trackId)
     {
-        $this->_albumId = $albumId;
-        $this->_album = Album::find($albumId);
+        $this->_trackId = $trackId;
+        $this->_track = Track::find($trackId);
     }
 
     /**
@@ -43,7 +42,7 @@ class DeleteAlbumCommand extends CommandBase
      */
     public function authorize()
     {
-        return Gate::allows('delete', $this->_album);
+        return Gate::allows('delete', $this->_track);
     }
 
     /**
@@ -52,14 +51,15 @@ class DeleteAlbumCommand extends CommandBase
      */
     public function execute()
     {
-        foreach ($this->_album->tracks as $track) {
-            $track->album_id = null;
-            $track->track_number = null;
-            $track->updateTags();
-            $track->save();
+        if ($this->_track->album_id != null) {
+            $album = $this->_track->album;
+            $this->_track->album_id = null;
+            $this->_track->track_number = null;
+            $this->_track->delete();
+            $album->updateTrackNumbers();
+        } else {
+            $this->_track->delete();
         }
-
-        $this->_album->delete();
 
         return CommandResponse::succeed();
     }

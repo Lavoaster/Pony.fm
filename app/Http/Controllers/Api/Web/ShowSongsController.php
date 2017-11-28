@@ -21,9 +21,9 @@
 namespace Poniverse\Ponyfm\Http\Controllers\Api\Web;
 
 use Illuminate\Support\Facades\Request;
-use Poniverse\Ponyfm\Commands\CreateShowSongCommand;
-use Poniverse\Ponyfm\Commands\DeleteShowSongCommand;
-use Poniverse\Ponyfm\Commands\RenameShowSongCommand;
+use Poniverse\Ponyfm\Commands\Old\CreateShowSongCommand;
+use Poniverse\Ponyfm\Commands\Old\DeleteShowSongCommand;
+use Poniverse\Ponyfm\Commands\Old\RenameShowSongCommand;
 use Poniverse\Ponyfm\Models\ShowSong;
 use Poniverse\Ponyfm\Http\Controllers\ApiControllerBase;
 use Response;

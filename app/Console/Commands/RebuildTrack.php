@@ -22,7 +22,7 @@ namespace Poniverse\Ponyfm\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Poniverse\Ponyfm\Commands\GenerateTrackFilesCommand;
+use Poniverse\Ponyfm\Commands\Old\GenerateTrackFilesCommand;
 use Poniverse\Ponyfm\Jobs\EncodeTrackFile;
 use Poniverse\Ponyfm\Models\Track;
 

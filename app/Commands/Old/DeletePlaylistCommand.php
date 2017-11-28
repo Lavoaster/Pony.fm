@@ -2,7 +2,7 @@
 
 /**
  * Pony.fm - A community for pony fan music.
- * Copyright (C) 2016 Josef Citrine
+ * Copyright (C) 2015 Peter Deltchev
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -18,20 +18,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-namespace Poniverse\Ponyfm\Commands;
+namespace Poniverse\Ponyfm\Commands\Old;
 
-use Gate;
-use Poniverse\Ponyfm\Models\Announcement;
-use Validator;
+use Poniverse\Ponyfm\Models\Playlist;
+use Auth;
 
-class CreateAnnouncementCommand extends CommandBase
+class DeletePlaylistCommand extends CommandBase
 {
-    /** @var Announcement */
-    private $_announcementName;
+    /** @var int */
+    private $_playlistId;
 
-    public function __construct($announcementName)
+    /** @var Playlist */
+    private $_playlist;
+
+    public function __construct($playlistId)
     {
-        $this->_announcementName = $announcementName;
+        $this->_playlistId = $playlistId;
+        $this->_playlist = Playlist::find($playlistId);
     }
 
     /**
@@ -39,7 +42,9 @@ class CreateAnnouncementCommand extends CommandBase
      */
     public function authorize()
     {
-        return Gate::allows('create-announcement');
+        $user = Auth::user();
+
+        return $this->_playlist && $user != null && $this->_playlist->user_id == $user->id;
     }
 
     /**
@@ -48,23 +53,12 @@ class CreateAnnouncementCommand extends CommandBase
      */
     public function execute()
     {
-
-        $rules = [
-            'name' => 'required|max:50',
-        ];
-
-        $validator = Validator::make([
-            'name' => $this->_announcementName,
-        ], $rules);
-
-        if ($validator->fails()) {
-            return CommandResponse::fail($validator);
+        foreach ($this->_playlist->pins as $pin) {
+            $pin->delete();
         }
 
-        Announcement::create([
-            'title' => $this->_announcementName,
-        ]);
+        $this->_playlist->delete();
 
-        return CommandResponse::succeed(['message' => 'Announcement created!']);
+        return CommandResponse::succeed();
     }
 }

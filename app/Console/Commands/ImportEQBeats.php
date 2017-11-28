@@ -14,7 +14,7 @@ use Poniverse\Ponyfm\Models\Track;
 use Poniverse\Ponyfm\Models\User;
 use Poniverse\Ponyfm\Models\Genre;
 use Poniverse\Ponyfm\Models\Album;
-use Poniverse\Ponyfm\Commands\UploadTrackCommand;
+use Poniverse\Ponyfm\Commands\Old\UploadTrackCommand;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
