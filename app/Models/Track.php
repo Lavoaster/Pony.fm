@@ -148,6 +148,11 @@ use Venturecraft\Revisionable\RevisionableTrait;
  */
 class Track extends Model implements Searchable, Commentable, Favouritable
 {
+    const SOURCE_DIRECT_UPLOAD = 'direct_upload';
+    const SOURCE_EQBEATS = 'eqbeats';
+    const SOURCE_MLPMA = 'mlpma';
+    const SOURCE_PONIFY = 'ponify';
+
     use SoftDeletes, IndexedInElasticsearchTrait;
 
     protected $elasticsearchType = 'track';
