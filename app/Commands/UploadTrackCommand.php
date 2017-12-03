@@ -8,6 +8,8 @@ use Poniverse\Ponyfm\Models\User;
 
 class UploadTrackCommand
 {
+    const DEFAULT_MIN_DURATION = 30;
+
     /**
      * @var User
      */
@@ -28,6 +30,14 @@ class UploadTrackCommand
      * @var bool
      */
     private $publishAfterProcessing;
+    /**
+     * @var bool
+     */
+    private $lossyAllowed;
+    /**
+     * @var int
+     */
+    private $minDuration;
     /**
      * @var null|string
      */
@@ -77,7 +87,7 @@ class UploadTrackCommand
      */
     private $isListed;
     /**
-     * @var array
+     * @var string
      */
     private $metadata;
 
@@ -87,6 +97,8 @@ class UploadTrackCommand
         UploadedFile $coverFile,
         string $source = Track::SOURCE_DIRECT_UPLOAD,
         bool $publishAfterProcessing = false,
+        bool $lossyAllowed = false,
+        int $minDuration = self::DEFAULT_MIN_DURATION,
         ?string $title = null,
         ?int $trackTypeId = null,
         ?string $genre = null,
@@ -99,9 +111,8 @@ class UploadTrackCommand
         ?bool $isExplicit = null,
         ?bool $isDownloadable = null,
         ?bool $isListed = null,
-        array $metadata = null
+        ?string $metadata = null
     ) {
-
         $this->artist = $artist;
         $this->trackFile = $trackFile;
         $this->coverFile = $coverFile;
@@ -120,6 +131,8 @@ class UploadTrackCommand
         $this->isDownloadable = $isDownloadable;
         $this->isListed = $isListed;
         $this->metadata = $metadata;
+        $this->lossyAllowed = $lossyAllowed;
+        $this->minDuration = $minDuration;
     }
 
     /**
@@ -160,6 +173,22 @@ class UploadTrackCommand
     public function shouldPublishAfterProcessing(): bool
     {
         return $this->publishAfterProcessing;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLossyAllowed(): bool
+    {
+        return $this->lossyAllowed;
+    }
+
+    /**
+     * @return int
+     */
+    public function getMinDuration(): int
+    {
+        return $this->minDuration;
     }
 
     /**
@@ -259,9 +288,9 @@ class UploadTrackCommand
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function getMetadata(): array
+    public function getMetadata(): string
     {
         return $this->metadata;
     }

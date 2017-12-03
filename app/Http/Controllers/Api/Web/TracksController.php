@@ -22,12 +22,14 @@ namespace Poniverse\Ponyfm\Http\Controllers\Api\Web;
 
 use Auth;
 use File;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Illuminate\Support\Facades\Request;
+use Illuminate\Http\Request;
 use Poniverse\Ponyfm\Commands\Old\DeleteTrackCommand;
 use Poniverse\Ponyfm\Commands\Old\EditTrackCommand;
 use Poniverse\Ponyfm\Commands\Old\GenerateTrackFilesCommand;
-use Poniverse\Ponyfm\Commands\Old\UploadTrackCommand;
+use Poniverse\Ponyfm\Commands\Old\UploadTrackCommand as OldUploadTrackCommand;
+use Poniverse\Ponyfm\Commands\UploadTrackCommand;
 use Poniverse\Ponyfm\Http\Controllers\ApiControllerBase;
 use Poniverse\Ponyfm\Jobs\EncodeTrackFile;
 use Poniverse\Ponyfm\Models\Genre;
@@ -41,11 +43,30 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class TracksController extends ApiControllerBase
 {
-    public function postUpload()
+    public function postUpload(Request $request, Guard $guard)
     {
         session_write_close();
 
-        return $this->execute(new UploadTrackCommand(true));
+        $artist = $request->filled('user_slug')
+            ? User::where('slug', $request->get('slug'))
+            : $guard->user();
+
+        $track = $this->bus->handle(new UploadTrackCommand(
+            $artist,
+            $request->file('track'),
+            $request->file('cover'),
+            Track::SOURCE_DIRECT_UPLOAD,
+            false,
+            true
+        ));
+
+        return response()->json([
+            'id' => $track->id,
+            'name' => $track->name,
+            'title' => $track->title,
+            'slug' => $track->slug,
+            'autoPublish' => false,
+        ]);
     }
 
     public function getUploadStatus($trackId)
@@ -55,12 +76,14 @@ class TracksController extends ApiControllerBase
 
         if ($track->status === Track::STATUS_PROCESSING) {
             return Response::json(['message' => 'Processing...'], 202);
-        } elseif ($track->status === Track::STATUS_COMPLETE) {
-            return Response::json(['message' => 'Processing complete!'], 201);
-        } else {
-            // something went wrong
-            return Response::json(['error' => 'Processing failed!'], 500);
         }
+
+        if ($track->status === Track::STATUS_COMPLETE) {
+            return Response::json(['message' => 'Processing complete!'], 201);
+        }
+
+        // something went wrong
+        return Response::json(['error' => 'Processing failed!'], 500);
     }
 
     public function postDelete($id)
@@ -85,7 +108,16 @@ class TracksController extends ApiControllerBase
 
         $track->version_upload_status = Track::STATUS_PROCESSING;
         $track->update();
-        return $this->execute(new UploadTrackCommand(true, false, null, false, $track->getNextVersion(), $track));
+
+        return response()->json([
+            'id' => $track->id,
+            'name' => $track->name,
+            'title' => $track->title,
+            'slug' => $track->slug,
+            'autoPublish' => false,
+        ]);
+
+        return $this->execute(new OldUploadTrackCommand(true, false, null, false, $track->getNextVersion(), $track));
     }
 
     public function getVersionUploadStatus($trackId)

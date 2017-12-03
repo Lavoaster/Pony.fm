@@ -95,7 +95,9 @@ class EncodeTrackFile extends Job implements ShouldQueue
         if ($this->trackFile->status === TrackFile::STATUS_PROCESSING) {
             Log::warning('Track file #'.$this->trackFile->id.' (track #'.$this->trackFile->track_id.') is already being processed!');
             return;
-        } elseif (!$this->trackFile->is_expired && File::exists($this->trackFile->getFile())) {
+        }
+
+        if (!$this->trackFile->is_expired && File::exists($this->trackFile->getFile())) {
             Log::warning('Track file #'.$this->trackFile->id.' (track #'.$this->trackFile->track_id.') is still valid! No need to re-encode it.');
             return;
         }
